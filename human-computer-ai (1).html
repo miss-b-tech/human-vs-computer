@@ -1,0 +1,364 @@
+<title>Human, Computer, or AI?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: one engineering calc sheet on graph paper; numbered Parts run top to bottom, score strip sticks to the top. */
+:root{
+  --paper:#e9eef1; --sheet:#fbfcfc; --ink:#17212a; --muted:#566571; --line:#cdd7dd;
+  --grid:rgba(31,79,191,.07); --accent:#1f4fbf; --accent-soft:rgba(31,79,191,.09);
+  --pencil:#bf3b26; --pencil-soft:rgba(191,59,38,.09); --ok:#2b7a4b; --ok-soft:rgba(43,122,75,.1);
+  --f-display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --f-body:"Atkinson Hyperlegible",Verdana,system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0e1418; --sheet:#162028; --ink:#e4ebef; --muted:#93a3ae; --line:#2b3843;
+  --grid:rgba(126,166,255,.06); --accent:#86abff; --accent-soft:rgba(134,171,255,.12);
+  --pencil:#ff8b74; --pencil-soft:rgba(255,139,116,.12); --ok:#72d29b; --ok-soft:rgba(114,210,155,.12); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0e1418; --sheet:#162028; --ink:#e4ebef; --muted:#93a3ae; --line:#2b3843;
+  --grid:rgba(126,166,255,.06); --accent:#86abff; --accent-soft:rgba(134,171,255,.12);
+  --pencil:#ff8b74; --pencil-soft:rgba(255,139,116,.12); --ok:#72d29b; --ok-soft:rgba(114,210,155,.12); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:16px/1.55 var(--f-body);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.sheet{max-width:780px;margin:0 auto;background:var(--sheet);border:1px solid var(--line);border-radius:4px;box-shadow:0 1px 0 var(--line),0 12px 30px -18px rgba(0,0,0,.25)}
+.inner{padding:clamp(18px,4vw,40px)}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0}
+h1{font-size:clamp(2.1rem,7vw,3.4rem);font-weight:800;font-stretch:72%;line-height:.95;letter-spacing:-.01em;text-transform:uppercase}
+h1 em{font-style:normal;color:var(--accent)}
+h2{font-size:1.6rem;font-weight:750;font-stretch:80%;line-height:1.1}
+h3{font-size:1.05rem;font-weight:700;font-stretch:90%}
+p{margin:0;max-width:65ch}
+.mono{font-family:var(--f-mono)}
+.label{font:500 .72rem/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+header.top{border-bottom:2px solid var(--ink);display:grid;gap:14px}
+.formline{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px}
+.lede{color:var(--muted)}
+.idrow{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-top:6px}
+.field{display:grid;gap:4px}
+input[type=text],textarea,select{font:inherit;color:var(--ink);background:transparent;border:0;border-bottom:1.5px solid var(--line);padding:6px 2px;width:100%;border-radius:0}
+textarea{border:1.5px solid var(--line);border-radius:3px;padding:10px;min-height:84px;resize:vertical;line-height:1.5}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+select{border:1.5px solid var(--line);border-radius:3px;padding:8px}
+
+.score{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--sheet);border-bottom:1px solid var(--line);
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;padding:10px clamp(18px,4vw,40px);font:500 .8rem var(--f-mono)}
+.score .bar{flex:1 1 140px;height:6px;background:var(--line);border-radius:3px;overflow:hidden;min-width:100px}
+.score .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.score b{color:var(--accent);font-variant-numeric:tabular-nums}
+
+section.part{display:grid;gap:16px;padding-block:30px;border-bottom:1px dashed var(--line)}
+section.part:last-of-type{border-bottom:0}
+.parthead{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.partno{font:800 2.4rem/1 var(--f-display);font-stretch:62%;color:var(--accent);grid-row:span 2}
+.std{font:500 .7rem var(--f-mono);color:var(--muted);letter-spacing:.04em}
+
+/* sorting rows */
+.items{display:grid;gap:10px}
+.item{border:1px solid var(--line);border-radius:4px;padding:12px;display:grid;gap:10px}
+.item.right{border-color:var(--ok);background:var(--ok-soft)}
+.item.wrong{border-color:var(--pencil);background:var(--pencil-soft)}
+.item p{font-weight:700}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{font:600 .82rem var(--f-mono);letter-spacing:.02em;color:var(--ink);background:var(--sheet);border:1.5px solid var(--line);border-radius:3px;padding:7px 11px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opt[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--sheet)}
+.fb{font-size:.92rem;color:var(--muted)}
+.fb strong{color:var(--ink)}
+.item.right .fb strong{color:var(--ok)}
+.item.wrong .fb strong{color:var(--pencil)}
+
+.callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 14px;border-radius:0 3px 3px 0;display:grid;gap:6px}
+.callout.pencil{border-color:var(--pencil);background:var(--pencil-soft)}
+.q{display:grid;gap:6px}
+.q label{font-weight:700}
+.hint{font-size:.85rem;color:var(--muted)}
+
+table.ctrl{width:100%;border-collapse:collapse;font-size:.94rem}
+.tablewrap{overflow-x:auto}
+table.ctrl th{font:500 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 8px;border-bottom:1.5px solid var(--ink)}
+table.ctrl td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+table.ctrl td:first-child{font-weight:700;min-width:110px}
+table.ctrl td:first-child span{display:block;font-weight:400;font-size:.82rem;color:var(--muted)}
+table.ctrl select{min-width:130px}
+table.ctrl input{min-width:180px}
+
+.frame{display:grid;gap:10px}
+.frame .line{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.frame .line span{font-weight:700;white-space:nowrap}
+.frame .line input{flex:1 1 220px;width:auto}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{font:700 .95rem var(--f-display);font-stretch:85%;letter-spacing:.04em;text-transform:uppercase;background:var(--ink);color:var(--sheet);border:0;border-radius:3px;padding:12px 18px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#copyOut{width:100%;min-height:160px;font:.82rem/1.5 var(--f-mono)}
+#status{font:500 .82rem var(--f-mono);color:var(--ok)}
+footer{padding-block:18px;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;display:grid;gap:8px}
+details summary{cursor:pointer;font:500 .75rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+details ul{margin:8px 0 0;padding-left:18px}
+
+@media (max-width:520px){.idrow{grid-template-columns:1fr}.partno{font-size:2rem}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="sheet">
+  <div class="inner">
+    <header class="top" style="padding-bottom:20px">
+      <div class="formline">
+        <span class="label">Form LRC-8 · West Area Computing</span>
+        <span class="label">Langley, VA 1961 → your classroom</span>
+      </div>
+      <h1>Human, <em>Computer,</em><br>or AI?</h1>
+      <p class="lede">In <i>Hidden Figures</i>, a "computer" was a person with a pencil. Then the IBM 7090 rolled in. Today, AI is rolling into factories, schools and jobs. Work through all six parts to figure out who should do what, and why.</p>
+      <div class="idrow">
+        <div class="field"><span class="label">Name</span><input type="text" id="name" autocomplete="off"></div>
+        <div class="field"><span class="label">Class period</span><input type="text" id="period" autocomplete="off"></div>
+      </div>
+    </header>
+  </div>
+
+  <div class="score" aria-live="polite">
+    <span>AUTO-CHECKED</span><span class="bar"><i id="barFill"></i></span><span><b id="scoreNum">0</b> / <span id="scoreMax">0</span> correct</span><span id="saved" class="label"></span>
+  </div>
+
+  <div class="inner" style="padding-top:0">
+
+    <!-- PART 1 -->
+    <section class="part">
+      <div class="parthead"><span class="partno">1</span><h2>Who does it best?</h2><span class="std">6-8.CS.b.1 · strengths of humans vs. machines</span></div>
+      <p>For each task, pick who should do it. <b>Computer</b> means a machine following exact steps a person programmed. <b>AI</b> means a machine that learned patterns from lots of examples. <b>Team</b> means humans and machines working together.</p>
+      <div class="items" id="p1"></div>
+    </section>
+
+    <!-- PART 2 -->
+    <section class="part">
+      <div class="parthead"><span class="partno">2</span><h2>Hidden Figures check</h2><span class="std">6-8.CS.b.2 · 6-8.CAS.c.2 · humans and machines solving problems together</span></div>
+      <div class="items" id="p2"></div>
+      <div class="q">
+        <label for="hf1">John Glenn said he wouldn't fly until Katherine Johnson checked the machine's numbers. Why didn't he fully trust the IBM? Was he right?</label>
+        <textarea id="hf1" data-save></textarea>
+      </div>
+      <div class="q">
+        <label for="hf2">Dorothy Vaughan saw the IBM coming and could have lost her job. What did she do instead, and what does that teach us about AI today?</label>
+        <textarea id="hf2" data-save></textarea>
+      </div>
+    </section>
+
+    <!-- PART 3 -->
+    <section class="part">
+      <div class="parthead"><span class="partno">3</span><h2>Computer or AI?</h2><span class="std">6-8.CS.b.1 · 6-8.CT.b.1 · rules vs. learning</span></div>
+      <div class="callout">
+        <h3>The difference in one line</h3>
+        <p><b>Computer program:</b> a human writes the rules, the machine follows them exactly. <i>"If temperature is below 68°, turn on heat."</i></p>
+        <p><b>AI:</b> a human gives the machine thousands of examples, and it figures out its own rules. <i>"Here are 50,000 photos of good and bad parts. Learn the difference."</i></p>
+      </div>
+      <div class="items" id="p3"></div>
+    </section>
+
+    <!-- PART 4 -->
+    <section class="part">
+      <div class="parthead"><span class="partno">4</span><h2>Run the control room</h2><span class="std">8.MS-ETS2-5(MA) · human vs. computer control of manufacturing</span></div>
+      <p>You're the plant manager at a factory that makes aluminum water bottles. For each stage of the manufacturing system, choose who's in control and give one reason. There's no single right answer, but your reason has to make sense.</p>
+      <div class="tablewrap">
+        <table class="ctrl">
+          <thead><tr><th>Stage</th><th>Who controls it?</th><th>Why?</th></tr></thead>
+          <tbody id="p4"></tbody>
+        </table>
+      </div>
+      <div class="callout pencil">
+        <h3>Something goes wrong</h3>
+        <p>Your AI quality-control camera was trained on 50,000 photos of silver bottles. This week the factory starts making <b>matte black</b> bottles, and the AI begins rejecting almost all of them, even the perfect ones.</p>
+      </div>
+      <div class="q">
+        <label for="mf1">Why is the AI failing? What should a human do right now, and what should happen to fix it for the future?</label>
+        <span class="hint">Think: what did the AI "learn" from, and what didn't it see? (6-8.CT.b.5 boundaries)</span>
+        <textarea id="mf1" data-save></textarea>
+      </div>
+    </section>
+
+    <!-- PART 5 -->
+    <section class="part">
+      <div class="parthead"><span class="partno">5</span><h2>Can a machine be unfair?</h2><span class="std">6-8.CAS.c.4 · 6-8.CAS.c.5 · bias in digital information</span></div>
+      <div class="callout pencil">
+        <h3>Thought experiment</h3>
+        <p>Imagine NASA in 1961 built an AI to pick new engineers. They trained it on every engineer they had ever hired. Almost all of them were white men, because the rules at the time kept women and Black Americans out of those jobs.</p>
+      </div>
+      <div class="items" id="p5"></div>
+      <div class="q">
+        <label for="bias1">Mary Jackson had to go to court just to take the classes she needed to become an engineer. How might the AI above have treated her application? What would a fair system need to do differently?</label>
+        <textarea id="bias1" data-save></textarea>
+      </div>
+    </section>
+
+    <!-- PART 6 -->
+    <section class="part">
+      <div class="parthead"><span class="partno">6</span><h2>Be the Dorothy Vaughan</h2><span class="std">6-8.CAS.c.1 · 6-8.CAS.c.2 · technology and the workplace</span></div>
+      <p>Dorothy didn't fight the machine. She learned FORTRAN and taught her whole team, so they became the people who ran it. Pick a job and plan its future.</p>
+      <div class="q">
+        <label for="job">Choose a job</label>
+        <select id="job" data-save>
+          <option value="">Pick one…</option>
+          <option>Doctor</option><option>Truck driver</option><option>Graphic designer</option><option>Teacher</option>
+          <option>Factory worker</option><option>Video game developer</option><option>Chef</option><option>Lawyer</option>
+          <option>Farmer</option><option>Content creator / influencer</option>
+        </select>
+      </div>
+      <div class="q"><label for="job1">One part of this job AI could do (or help with):</label><input type="text" id="job1" data-save></div>
+      <div class="q"><label for="job2">One part that should stay human, and why:</label><input type="text" id="job2" data-save></div>
+      <div class="q"><label for="job3">The "FORTRAN skill" this worker should learn now to stay ahead:</label><input type="text" id="job3" data-save></div>
+
+      <div class="callout" style="margin-top:6px">
+        <h3>Exit ticket</h3>
+        <div class="frame">
+          <div class="line"><span>Machines are better at</span><input type="text" id="ex1" data-save></div>
+          <div class="line"><span>Humans are better at</span><input type="text" id="ex2" data-save></div>
+          <div class="line"><span>The best results happen when</span><input type="text" id="ex3" data-save></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="part" style="gap:12px">
+      <h2>Turn it in</h2>
+      <p>Click the button, then paste your answers into the assignment in Google Classroom.</p>
+      <div class="actions">
+        <button class="btn" id="copyBtn" type="button">Copy my answers</button>
+        <button class="btn ghost" id="resetBtn" type="button">Start over</button>
+        <span id="status"></span>
+      </div>
+      <div id="resetConfirm" class="callout pencil" hidden>
+        <p>Erase every answer on this page?</p>
+        <div class="actions"><button class="btn" id="resetYes" type="button">Yes, erase</button><button class="btn ghost" id="resetNo" type="button">Keep my work</button></div>
+      </div>
+      <textarea id="copyOut" readonly hidden aria-label="Your answers as text"></textarea>
+    </section>
+
+    <footer>
+      <details>
+        <summary>For teachers · standards covered</summary>
+        <ul>
+          <li>8.MS-ETS2-5(MA): human vs. computer control of manufacturing processes (Part 4)</li>
+          <li>6-8.CS.b.1–2: tasks suited to humans vs. computers; solving problems together (Parts 1–3)</li>
+          <li>6-8.CT.b.1, b.5: rules/conditionals; algorithm boundaries (Parts 3–4)</li>
+          <li>6-8.CAS.c.1, c.2, c.4, c.5: emerging tech, workplace skills, bias (Parts 2, 5, 6)</li>
+        </ul>
+        <p style="margin-top:8px">Answers save in the student's browser on this device. Auto-checked items: Parts 1, 2, 3 and 5 multiple choice.</p>
+      </details>
+    </footer>
+  </div>
+</div>
+
+<script>
+const H="Human",C="Computer",A="AI",T="Team";
+const DATA={
+ p1:{opts:[H,C,A,T],items:[
+  ["Calculate 10,000 possible launch trajectories in one hour",C,"Fast, exact, repeated math with clear rules is exactly what computers were built for."],
+  ["Decide if a launch is safe enough to send an astronaut",T,"Computers crunch the data, but a human has to weigh the risk and take responsibility for a life."],
+  ["Spot a tiny scratch on 5,000 bottles per hour from camera photos",A,"Recognizing what a 'scratch' looks like is pattern-learning from examples, which is AI's strength."],
+  ["Notice a teammate is stressed and help them stay calm",H,"Reading emotions and caring about someone is a human skill."],
+  ["Add up two numbers one million times with zero mistakes",C,"Humans get tired and make errors. A computer following a rule doesn't."],
+  ["Pick the next video in your feed",A,"Recommendation systems learn from what millions of people clicked. Nobody hand-wrote that rule."],
+  ["Invent a brand-new way to solve a problem nobody has solved before",H,"Katherine Johnson used an old method (Euler's) in a new way. Real invention still comes from people."],
+  ["Read thousands of X-rays and flag possible problems for a doctor",T,"AI can scan fast and flag concerns, but a doctor makes the call and talks to the patient."]
+ ]},
+ p2:{items:[
+  ["In 1961, what did the word \"computer\" mean at NASA?",["A room-sized machine","A person who did math calculations by hand","A calculator","A type of rocket"],1,"Katherine, Dorothy and Mary's group were literally called 'computers.'"],
+  ["When the IBM 7090 arrived, what did Dorothy Vaughan do?",["Quit her job","Tried to break the machine","Taught herself and her team FORTRAN to program it","Ignored it"],2,"She learned the machine's language and made her team the experts."],
+  ["Why did the IBM's numbers need a human check before Glenn's flight?",["The machine was turned off","It was new and its results hadn't been proven yet","Humans are always more accurate","NASA had no electricity"],1,"New technology needs to be tested. Trust has to be earned with results."],
+  ["What made the team successful in the end?",["Humans alone","The IBM alone","Humans and machines each doing what they do best","Luck"],2,"That's the big idea of this whole worksheet."]
+ ]},
+ p3:{opts:["Computer program","AI"],items:[
+  ["A calculator","Computer program","Every button follows a fixed rule a human wrote."],
+  ["A thermostat that turns on heat below 68°","Computer program","That's a conditional: if/then. Pure rules."],
+  ["A spam filter that learned from millions of emails","AI","Nobody wrote a rule for every spam email. It learned the pattern."],
+  ["Face ID unlocking your phone","AI","It learned what your face looks like from examples."],
+  ["A CNC machine cutting metal from exact coordinates","Computer program","It follows step-by-step coordinates (G-code) exactly."],
+  ["The IBM 7090 running Katherine's equations","Computer program","It did exactly the math humans programmed into it, just faster."],
+  ["A chatbot that writes an essay","AI","It learned language patterns from huge amounts of text."],
+  ["A factory robot arm that welds in the same spot every time","Computer program","Same motion, same spot, programmed once and repeated."]
+ ]},
+ p4:[["Forming","shaping metal into a bottle"],["Separating","cutting off extra metal"],["Conditioning","heat-treating to make it stronger"],["Assembling","attaching the cap and seal"],["Finishing","painting and printing the logo"],["Quality control","inspecting for defects"],["Safety","protecting workers"]],
+ p5:{items:[
+  ["What would this AI most likely learn?",["To pick the smartest people","That good engineers look like the people already hired","To ignore gender and race","Nothing, AI can't learn"],1,"AI copies the patterns in its data, including unfair ones."],
+  ["Who would the AI unfairly reject?",["People like Mary Jackson and Katherine Johnson","Nobody","Only people without math skills","Only astronauts"],0,"The most talented people in the movie would have been filtered out."],
+  ["What's the best fix?",["Never use AI","Trust the AI because computers are neutral","Check the training data for bias and keep humans reviewing decisions","Train it on even more of the same data"],2,"AI isn't automatically fair. Humans have to check what it learned."]
+ ]}
+};
+
+const KEY="hca-worksheet-v1";
+let state={};
+try{state=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){state={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));document.getElementById("saved").textContent="Saved"}catch(e){}}
+
+function el(t,c,txt){const e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e}
+
+function sortItem(container,id,text,opts,answer,why){
+  const box=el("div","item");box.appendChild(el("p",null,text));
+  const row=el("div","opts");const fb=el("div","fb");
+  opts.forEach((o,i)=>{const b=el("button","opt",o);b.type="button";b.setAttribute("aria-pressed","false");
+    b.onclick=()=>{state[id]=i;save();paint()};row.appendChild(b)});
+  box.append(row,fb);container.appendChild(box);
+  function paint(){const v=state[id];[...row.children].forEach((b,i)=>b.setAttribute("aria-pressed",String(i===v)));
+    box.classList.remove("right","wrong");fb.innerHTML="";
+    if(v==null)return;const ok=v===answer;box.classList.add(ok?"right":"wrong");
+    const s=el("strong",null,ok?"Correct. ":"Not quite. Best answer: "+opts[answer]+". ");fb.append(s,document.createTextNode(why));score()}
+  paint();return{id,answer,opts,text};
+}
+
+const graded=[];
+DATA.p1.items.forEach((it,i)=>graded.push(sortItem(document.getElementById("p1"),"p1_"+i,it[0],DATA.p1.opts,DATA.p1.opts.indexOf(it[1]),it[2])));
+DATA.p2.items.forEach((it,i)=>graded.push(sortItem(document.getElementById("p2"),"p2_"+i,it[0],it[1],it[2],it[3])));
+DATA.p3.items.forEach((it,i)=>graded.push(sortItem(document.getElementById("p3"),"p3_"+i,it[0],DATA.p3.opts,DATA.p3.opts.indexOf(it[1]),it[2])));
+DATA.p5.items.forEach((it,i)=>graded.push(sortItem(document.getElementById("p5"),"p5_"+i,it[0],it[1],it[2],it[3])));
+
+const tb=document.getElementById("p4");
+DATA.p4.forEach((s,i)=>{const tr=el("tr");const td0=el("td",null,s[0]);td0.appendChild(el("span",null,s[1]));
+  const sel=el("select");sel.id="mfg_s"+i;sel.setAttribute("data-save","");sel.setAttribute("aria-label",s[0]+" control");
+  ["Choose…","Human","Computer","AI","Human + machine"].forEach((o,j)=>{const op=el("option",null,o);op.value=j?o:"";sel.appendChild(op)});
+  const inp=el("input");inp.type="text";inp.id="mfg_r"+i;inp.setAttribute("data-save","");inp.setAttribute("aria-label",s[0]+" reason");
+  const td1=el("td");td1.appendChild(sel);const td2=el("td");td2.appendChild(inp);tr.append(td0,td1,td2);tb.appendChild(tr)});
+
+document.getElementById("name").setAttribute("data-save","");document.getElementById("period").setAttribute("data-save","");
+document.querySelectorAll("[data-save]").forEach(f=>{if(state[f.id]!=null)f.value=state[f.id];
+  f.addEventListener("input",()=>{state[f.id]=f.value;save()})});
+
+function score(){let n=0;graded.forEach(g=>{if(state[g.id]===g.answer)n++});
+  document.getElementById("scoreNum").textContent=n;document.getElementById("scoreMax").textContent=graded.length;
+  document.getElementById("barFill").style.width=(n/graded.length*100)+"%"}
+score();
+
+function v(id){return (state[id]||"").trim()||"(blank)"}
+function build(){
+  const L=[];L.push("HUMAN, COMPUTER, OR AI? — "+v("name")+" · Period "+v("period"));
+  let n=0;graded.forEach(g=>{if(state[g.id]===g.answer)n++});L.push("Auto-checked score: "+n+"/"+graded.length,"");
+  const part=(title,pre,count)=>{L.push(title);for(let i=0;i<count;i++){const g=graded.find(x=>x.id===pre+i);const a=state[g.id];
+    L.push("- "+g.text+" → "+(a==null?"(blank)":g.opts[a])+(a===g.answer?" ✓":a==null?"":" ✗"))}L.push("")};
+  part("PART 1: Who does it best?","p1_",DATA.p1.items.length);
+  part("PART 2: Hidden Figures check","p2_",DATA.p2.items.length);
+  L.push("Why didn't Glenn trust the IBM? "+v("hf1"),"Dorothy Vaughan & AI today: "+v("hf2"),"");
+  part("PART 3: Computer or AI?","p3_",DATA.p3.items.length);
+  L.push("PART 4: Control room");DATA.p4.forEach((s,i)=>L.push("- "+s[0]+": "+v("mfg_s"+i)+" — "+v("mfg_r"+i)));
+  L.push("Black bottle problem: "+v("mf1"),"");
+  part("PART 5: Can a machine be unfair?","p5_",DATA.p5.items.length);
+  L.push("Mary Jackson & fair AI: "+v("bias1"),"");
+  L.push("PART 6: Future of work — "+v("job"),"- AI could do: "+v("job1"),"- Stays human: "+v("job2"),"- Skill to learn: "+v("job3"),"");
+  L.push("EXIT TICKET","Machines are better at "+v("ex1"),"Humans are better at "+v("ex2"),"The best results happen when "+v("ex3"));
+  return L.join("\n")}
+
+const out=document.getElementById("copyOut"),st=document.getElementById("status");
+document.getElementById("copyBtn").onclick=()=>{const t=build();out.value=t;out.hidden=false;
+  const fallback=()=>{out.focus();out.select();st.textContent="Text selected. Press Ctrl+C (or ⌘C) to copy."};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>{st.textContent="Copied. Paste it into Google Classroom."},fallback)}else fallback()};
+const rc=document.getElementById("resetConfirm");
+document.getElementById("resetBtn").onclick=()=>{rc.hidden=false};
+document.getElementById("resetNo").onclick=()=>{rc.hidden=true};
+document.getElementById("resetYes").onclick=()=>{state={};try{localStorage.removeItem(KEY)}catch(e){}location.reload()};
+</script>
